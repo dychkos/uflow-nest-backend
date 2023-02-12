@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-    id          Int @id @default(autoincrement())
+    id          String      @id @default(uuid())
 
     email       String @unique
     password    String
@@ -30,11 +30,11 @@ model User {
 
 
 model Flow {
-    id          Int @id @default(autoincrement())
+    id          String      @id @default(uuid())
     title       String
 
     user        User @relation(fields: [userId], references: [id])
-    userId      Int
+    userId      String
 
     tasks       Task[]
 
@@ -45,13 +45,13 @@ model Flow {
 }
 
 model Task {
-    id          Int @id @default(autoincrement())
+    id          String      @id @default(uuid())
 
 //    user        User @relation(fields: [userId], references: [id])
 //    userId      Int
 
     flow        Flow @relation(fields: [flowId], references: [id])
-    flowId      Int
+    flowId      String
 
     action      String //Прочитати
     how_many    Int //10
@@ -78,14 +78,11 @@ model Day {
 }
 
 model DaysOnTasks {
-  task       Task     @relation(fields: [taskId], references: [id])
-  taskId     Int // relation scalar field (used in the `@relation` attribute above)
+  task       Task     @relation(fields: [taskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  taskId     String // relation scalar field (used in the `@relation` attribute above)
 
-  day        Day @relation(fields: [dayId], references: [id])
+  day        Day @relation(fields: [dayId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   dayId      Int // relation scalar field (used in the `@relation` attribute above)
-
-  assignedAt DateTime @default(now())
-  assignedBy String
 
   @@id([taskId, dayId])
 }

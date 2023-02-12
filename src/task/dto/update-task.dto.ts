@@ -1,6 +1,6 @@
-import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsString } from 'class-validator';
 
-export class CreateTaskDto {
+export class UpdateTaskDto {
   @IsString()
   action: string;
 
@@ -13,7 +13,9 @@ export class CreateTaskDto {
   @IsInt()
   reward: number;
 
-  @IsNotEmpty()
+  @IsBoolean()
+  done: boolean;
+
   @IsArray()
   days: [];
 }

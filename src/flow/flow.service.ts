@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class FlowService {
   constructor(private prisma: PrismaService) {}
 
-  async create(userId: number, createFlowDto: CreateFlowDto) {
+  async create(userId: string, createFlowDto: CreateFlowDto) {
     return await this.prisma.flow.create({
       data: {
         title: createFlowDto.title,
@@ -16,13 +16,13 @@ export class FlowService {
     });
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: string) {
     return await this.prisma.flow.findMany({
       where: { userId },
     });
   }
 
-  async findOne(id: number, userId: number) {
+  async findOne(id: string, userId: string) {
     const flow = await this.prisma.flow.findFirst({
       where: { id, userId },
     });
@@ -35,7 +35,7 @@ export class FlowService {
     return flow;
   }
 
-  async update(id: number, userId: number, updateFlowDto: UpdateFlowDto) {
+  async update(id: string, userId: string, updateFlowDto: UpdateFlowDto) {
     const flow = await this.prisma.flow.findFirst({
       where: { id, userId },
     });
@@ -50,7 +50,7 @@ export class FlowService {
     });
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: string, userId: string) {
     let flow = await this.prisma.flow.findFirst({
       where: { id, userId },
     });

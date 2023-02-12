@@ -23,33 +23,33 @@ export class FlowController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  create(@GetUser('id') userId: number, @Body() dto: CreateFlowDto) {
+  create(@GetUser('id') userId: string, @Body() dto: CreateFlowDto) {
     return this.flowService.create(userId, dto);
   }
 
   @Get()
-  findAll(@GetUser('id') userId: number) {
+  findAll(@GetUser('id') userId: string) {
     return this.flowService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @GetUser('id') userId: number) {
-    return this.flowService.findOne(+id, userId);
+  findOne(@Param('id') id: string, @GetUser('id') userId: string) {
+    return this.flowService.findOne(id, userId);
   }
 
   @HttpCode(HttpStatus.CREATED)
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @GetUser('id') userId: number,
+    @GetUser('id') userId: string,
     @Body() updateFlowDto: UpdateFlowDto,
   ) {
-    return this.flowService.update(+id, userId, updateFlowDto);
+    return this.flowService.update(id, userId, updateFlowDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Delete(':id')
-  remove(@Param('id') id: string, @GetUser('id') userId: number) {
-    return this.flowService.remove(+id, userId);
+  remove(@Param('id') id: string, @GetUser('id') userId: string) {
+    return this.flowService.remove(id, userId);
   }
 }
