@@ -19,12 +19,18 @@ export class FlowService {
   async findAll(userId: string) {
     return await this.prisma.flow.findMany({
       where: { userId },
+      include: {
+        tasks: true,
+      },
     });
   }
 
   async findOne(id: string, userId: string) {
     const flow = await this.prisma.flow.findFirst({
       where: { id, userId },
+      include: {
+        tasks: true,
+      },
     });
 
     if (!flow) {

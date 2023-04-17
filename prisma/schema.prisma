@@ -19,8 +19,8 @@ model User {
     username    String
     fullname    String?
 
-//    tasks       Task[]
-    flows       Flow[]
+    place_of_work String
+
 
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt

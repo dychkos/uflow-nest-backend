@@ -55,6 +55,19 @@ export class AuthService {
     return this.signToken(user.id, user.email);
   }
 
+  async verifyAuth(token: string) {
+    console.log('token', token);
+    try {
+      this.jwt.verify(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   async signToken(
     userId: string,
     email: string,
