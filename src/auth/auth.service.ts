@@ -56,7 +56,6 @@ export class AuthService {
   }
 
   async verifyAuth(token: string) {
-    console.log('token', token);
     try {
       this.jwt.verify(token, {
         secret: this.config.get('JWT_SECRET'),
