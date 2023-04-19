@@ -6,12 +6,21 @@ import {
 } from '@nestjs/common';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { Task } from '@prisma/client';
+
+interface TaskWithDays extends Task {
+  days?: number[];
+}
 
 @Injectable()
 export class TaskService {
   constructor(private prisma: PrismaService) {}
 
-  async createTask(flowId: string, userId: string, dto: CreateTaskDto) {
+  async createTask(
+    flowId: string,
+    userId: string,
+    dto: CreateTaskDto,
+  ): Promise<TaskWithDays> {
     const userFlow = await this.prisma.flow.findFirst({
       where: { id: flowId, userId: userId },
     });
@@ -45,17 +54,26 @@ export class TaskService {
       }
     }
 
-    return await this.prisma.task.findFirst({
-      where: { id: task.id, flowId: flowId },
-      include: {
-        days: {
-          include: { day: true },
+    const daysArr = await this.prisma.day.findMany({
+      where: {
+        id: {
+          in: days.map((day) => day.dayId),
         },
       },
     });
+
+    return {
+      ...task,
+      days: daysArr.map((day) => day.id),
+    };
   }
 
-  async update(id: string, flowId: string, userId: string, dto: UpdateTaskDto) {
+  async update(
+    id: string,
+    flowId: string,
+    userId: string,
+    dto: UpdateTaskDto,
+  ): Promise<TaskWithDays> {
     const flow = this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
@@ -72,12 +90,18 @@ export class TaskService {
         where: { taskId: id },
       });
 
-      await this.prisma.daysOnTasks.createMany({
-        data: days,
-      });
+      try {
+        await this.prisma.daysOnTasks.createMany({
+          data: days,
+        });
+      } catch (e) {
+        if (e.code === 'P2003') {
+          throw new ForbiddenException('Provide correct Days values [1-7]');
+        }
+      }
     }
 
-    return await this.prisma.task.update({
+    const task = await this.prisma.task.update({
       where: { id },
       data: {
         action: dto.action,
@@ -86,8 +110,16 @@ export class TaskService {
         reward: dto.reward,
         done: dto.done,
       },
-      include: { days: { include: { day: true } } },
     });
+
+    const daysArr = await this.prisma.daysOnTasks.findMany({
+      where: { taskId: id },
+    });
+
+    return {
+      ...task,
+      days: daysArr.map((day) => day.dayId),
+    };
   }
 
   async remove(id: string, flowId: string, userId: string) {
@@ -100,7 +132,11 @@ export class TaskService {
     return await this.prisma.task.delete({ where: { id } });
   }
 
-  async findOne(id: string, flowId: string, userId: string) {
+  async findOne(
+    id: string,
+    flowId: string,
+    userId: string,
+  ): Promise<TaskWithDays> {
     const flow = this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
@@ -108,33 +144,47 @@ export class TaskService {
     }
     const task = await this.prisma.task.findFirst({
       where: { id },
-      include: {
-        days: {
-          include: {
-            day: true,
-          },
-        },
-      },
     });
 
     if (!task) {
       throw new NotFoundException();
     }
 
-    return task;
+    const daysArr = await this.prisma.daysOnTasks.findMany({
+      where: { taskId: id },
+    });
+
+    return {
+      ...task,
+      days: daysArr.map((day) => day.dayId),
+    };
   }
 
-  async findAll(flowId: string, userId: string) {
+  async findAll(flowId: string, userId: string): Promise<TaskWithDays[]> {
     const flow = this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
       throw new ForbiddenException('Provide correct flow id');
     }
 
-    return this.prisma.task.findMany({
+    const tasks = await this.prisma.task.findMany({
       where: { flowId: flowId },
-      include: { days: { include: { day: true } } },
     });
+
+    const final = [];
+
+    for (const tasksKey in tasks) {
+      const daysArr = await this.prisma.daysOnTasks.findMany({
+        where: { taskId: tasks[tasksKey].id },
+      });
+
+      final.push({
+        ...tasks[tasksKey],
+        days: daysArr.map((day) => day.dayId),
+      });
+    }
+
+    return final;
   }
 
   private async checkDoesExistFlow(flowId: string, userId: string) {

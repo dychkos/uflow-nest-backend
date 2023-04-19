@@ -19,8 +19,7 @@ model User {
     username    String
     fullname    String?
 
-    place_of_work String
-
+    flows       Flow[]
 
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -40,6 +39,8 @@ model Flow {
 
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+
+    chosen      Boolean  @default(false)
 
     @@map("flows")
 }
