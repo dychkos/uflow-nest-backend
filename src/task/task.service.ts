@@ -74,7 +74,7 @@ export class TaskService {
     userId: string,
     dto: UpdateTaskDto,
   ): Promise<TaskWithDays> {
-    const flow = this.checkDoesExistFlow(flowId, userId);
+    const flow = await this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
       throw new ForbiddenException('Provide correct flow id');
@@ -123,7 +123,7 @@ export class TaskService {
   }
 
   async remove(id: string, flowId: string, userId: string) {
-    const flow = this.checkDoesExistFlow(flowId, userId);
+    const flow = await this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
       throw new ForbiddenException('Provide correct flow id');
@@ -137,7 +137,7 @@ export class TaskService {
     flowId: string,
     userId: string,
   ): Promise<TaskWithDays> {
-    const flow = this.checkDoesExistFlow(flowId, userId);
+    const flow = await this.checkDoesExistFlow(flowId, userId);
 
     if (!flow) {
       throw new ForbiddenException('Provide correct flow id');
@@ -161,7 +161,9 @@ export class TaskService {
   }
 
   async findAll(flowId: string, userId: string): Promise<TaskWithDays[]> {
-    const flow = this.checkDoesExistFlow(flowId, userId);
+    console.log(flowId, userId);
+    const flow = await this.checkDoesExistFlow(flowId, userId);
+    console.log(flow);
 
     if (!flow) {
       throw new ForbiddenException('Provide correct flow id');
