@@ -8,10 +8,20 @@ export class FlowService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, createFlowDto: CreateFlowDto) {
+    let chosen = false;
+    const chosenFlow = await this.prisma.flow.findFirst({
+      where: { userId, chosen: true },
+    });
+
+    if (!chosenFlow) {
+      chosen = true;
+    }
+
     return await this.prisma.flow.create({
       data: {
         title: createFlowDto.title,
         userId: userId,
+        chosen,
       },
     });
   }
@@ -48,6 +58,19 @@ export class FlowService {
 
     if (!flow) {
       throw new NotFoundException();
+    }
+
+    if (updateFlowDto.chosen) {
+      const chosenFlow = await this.prisma.flow.findFirst({
+        where: { userId, chosen: true },
+      });
+
+      if (chosenFlow) {
+        await this.prisma.flow.update({
+          where: { id: chosenFlow.id },
+          data: { ...chosenFlow, chosen: false },
+        });
+      }
     }
 
     return await this.prisma.flow.update({

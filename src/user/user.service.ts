@@ -1,6 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Flow, User } from '@prisma/client';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 interface UserWithChosenFlow extends User {
   chosenFlow?: Flow;
@@ -29,5 +30,18 @@ export class UserService {
       ...user,
       chosenFlow,
     };
+  }
+
+  async update(userId: string, dto: UpdateUserDto) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...dto,
+      },
+    });
+
+    delete user.password;
+
+    return user;
   }
 }

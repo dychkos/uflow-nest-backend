@@ -21,6 +21,10 @@ model User {
 
     flows       Flow[]
 
+    doneTasks   Int @default(0)
+    globalCoins Int @default(0)
+    earnedCoins Int @default(0)
+
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
