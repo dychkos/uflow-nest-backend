@@ -5,6 +5,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { TaskModule } from './task/task.module';
 import { FlowModule } from './flow/flow.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DailyJobService } from './jobs/dayli-job.service';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { FlowModule } from './flow/flow.module';
     UserModule,
     TaskModule,
     FlowModule,
+    ScheduleModule.forRoot(),
   ],
+  providers: [DailyJobService],
 })
 export class AppModule {}
