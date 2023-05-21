@@ -194,4 +194,10 @@ export class TaskService {
       where: { id: flowId, userId: userId },
     });
   }
+
+  public async refresh() {
+    return this.prisma.task.updateMany({
+      data: { done: false },
+    });
+  }
 }

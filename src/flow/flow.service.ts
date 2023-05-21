@@ -65,6 +65,11 @@ export class FlowService {
         where: { userId, chosen: true },
       });
 
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { doneTasks: 0 },
+      });
+
       if (chosenFlow) {
         await this.prisma.flow.update({
           where: { id: chosenFlow.id },

@@ -44,4 +44,11 @@ export class UserService {
 
     return user;
   }
+
+  async refresh() {
+    console.log('refreshing user');
+    return this.prisma.user.updateMany({
+      data: { doneTasks: 0, earnedCoins: 0 },
+    });
+  }
 }
